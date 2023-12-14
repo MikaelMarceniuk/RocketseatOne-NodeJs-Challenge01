@@ -83,6 +83,27 @@ export default [
         const newTask = { title, description }
         removeUndefinedFromObject(newTask)
 
+        if (Object.keys(newTask).length == 0)
+          throw new OperationalError(
+            `Task title and/or description must not be undefined or empty`,
+            true,
+            400
+          )
+
+        if (title == "")
+          throw new OperationalError(
+            `Task title must not be undefined or empty`,
+            true,
+            400
+          )
+
+        if (description == "")
+          throw new OperationalError(
+            `Task description must not be undefined or empty`,
+            true,
+            400
+          )
+
         Database.update(taskTable, id, newTask)
 
         res.end()
