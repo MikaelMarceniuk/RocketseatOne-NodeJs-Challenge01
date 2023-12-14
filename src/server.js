@@ -1,10 +1,13 @@
 import http from "node:http"
 import router from "./router.js"
 import extractQueryParams from "./utils/extractQueryParams.js"
+import readBody from "./middlewares/readBody.js"
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const { method, url } = req
   console.log(method, url)
+
+  await readBody(req, res)
 
   const route = router.find((r) => r.method == method && r.url.test(url))
   if (route) {
