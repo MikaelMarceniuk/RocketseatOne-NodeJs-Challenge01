@@ -1,4 +1,5 @@
 import buildRoutePath from "./utils/buildRoutePath.js"
+import Database from "./db/index.js"
 
 export default [
   {
