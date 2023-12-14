@@ -1,0 +1,15 @@
+{
+  "name": "rocketseatone-nodejs-challenge01",
+  "version": "1.0.0",
+  "description": "First challenge of NodeJs formation.",
+  "main": "src/server.js",
+  "type": "module",
+  "author": "Mikael Marceniuk",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "scripts": {
+    "start:dev": "node --watch src/server.js"
+  }
+}
