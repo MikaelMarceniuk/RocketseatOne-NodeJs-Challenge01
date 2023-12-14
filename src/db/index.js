@@ -19,7 +19,11 @@ class Database {
   findById(table, id) {
     const dbTaskIndex = this.#database[table].findIndex((p) => p.id == id)
     if (dbTaskIndex == -1)
-      throw new OperationalError(`Task not found with id '${id}'`, true, 404)
+      throw new OperationalError(
+        "O registro nao existe com o id passado.",
+        true,
+        404
+      )
 
     return {
       index: dbTaskIndex,
