@@ -3,6 +3,9 @@ import Database from "./db/index.js"
 import Task from "./models/task.js"
 import removeUndefinedFromObject from "./utils/removeUndefinedFromObject.js"
 import OperationalError from "./utils/operationalError.js"
+import { parse } from "csv-parse"
+import fs from "node:fs"
+import path from "node:path"
 
 const taskTable = "tasks"
 
@@ -160,6 +163,31 @@ export default [
 
         res.writeHead(500).end(e.toString())
       }
+    },
+  },
+  {
+    method: "POST",
+    url: buildRoutePath("/tasks/import"),
+    handler: async (req, res) => {
+      const csvPath = path.resolve(process.cwd(), "src", "mock", "tasks.csv")
+      const stream = fs.createReadStream(csvPath)
+
+      const csvParse = parse({
+        delimiter: ",",
+        skipEmptyLines: true,
+        fromLine: 2, // skip the header line
+      })
+
+      for await (const [title, description] of stream.pipe(csvParse)) {
+        await fetch("http://localhost:3333/tasks", {
+          method: "POST",
+          body: JSON.stringify({ title, description }),
+        })
+
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      }
+
+      res.end()
     },
   },
 ]

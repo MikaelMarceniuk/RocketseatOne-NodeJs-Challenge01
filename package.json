@@ -11,5 +11,8 @@
   },
   "scripts": {
     "start:dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.3"
   }
 }
