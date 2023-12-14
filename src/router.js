@@ -1,5 +1,6 @@
 import buildRoutePath from "./utils/buildRoutePath.js"
 import Database from "./db/index.js"
+import Task from "./models/task.js"
 
 export default [
   {
@@ -10,15 +11,21 @@ export default [
   {
     method: "GET",
     url: buildRoutePath("/tasks"),
-    handler: (req, res) => {
-      res.end("Found method GET of task resource")
+    handler: (_, res) => {
+      const dbTasks = Database.select("tasks")
+      res.end(JSON.stringify(dbTasks))
     },
   },
   {
     method: "POST",
     url: buildRoutePath("/tasks"),
     handler: (req, res) => {
-      res.end("Found method POST of task resource")
+      const { title, description } = req.body
+      const newTask = new Task(title, description)
+
+      Database.insert("tasks", newTask)
+
+      res.writeHead(201).end()
     },
   },
   {

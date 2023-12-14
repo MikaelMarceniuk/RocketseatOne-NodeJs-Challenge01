@@ -1,10 +1,14 @@
+import { randomUUID } from "node:crypto"
+
 class Task {
-  constructor(id, title, description, completed_at, created_at, updated_at) {
-    this.id = id
+  constructor(title, description) {
+    this.id = randomUUID()
     this.title = title
     this.description = description
-    this.completed_at = completed_at
-    this.created_at = created_at
-    this.updated_at = updated_at
+    this.completed_at = null
+    this.created_at = new Date().toJSON()
+    this.updated_at = null
   }
 }
+
+export default Task
