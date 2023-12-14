@@ -1,4 +1,5 @@
 import fs from "node:fs/promises"
+import OperationalError from "../utils/operationalError.js"
 
 const dbDataUrl = new URL("dbData.json", import.meta.url)
 
@@ -17,7 +18,8 @@ class Database {
 
   findById(table, id) {
     const dbTaskIndex = this.#database[table].findIndex((p) => p.id == id)
-    if (dbTaskIndex == -1) throw new Error(`Task not found with id ${id}`)
+    if (dbTaskIndex == -1)
+      throw new OperationalError(`Task not found with id '${id}'`, true, 404)
 
     return {
       index: dbTaskIndex,
