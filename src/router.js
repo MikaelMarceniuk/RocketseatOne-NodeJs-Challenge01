@@ -2,6 +2,8 @@ import buildRoutePath from "./utils/buildRoutePath.js"
 import Database from "./db/index.js"
 import Task from "./models/task.js"
 
+const taskTable = "tasks"
+
 export default [
   {
     method: "GET",
@@ -12,7 +14,7 @@ export default [
     method: "GET",
     url: buildRoutePath("/tasks"),
     handler: (_, res) => {
-      const dbTasks = Database.select("tasks")
+      const dbTasks = Database.select(taskTable)
       res.end(JSON.stringify(dbTasks))
     },
   },
@@ -23,7 +25,7 @@ export default [
       const { title, description } = req.body
       const newTask = new Task(title, description)
 
-      Database.insert("tasks", newTask)
+      Database.insert(taskTable, newTask)
 
       res.writeHead(201).end()
     },
@@ -32,21 +34,34 @@ export default [
     method: "PUT",
     url: buildRoutePath("/tasks/:id"),
     handler: (req, res) => {
-      res.end("Found method PUT of task resource")
+      const { id } = req.params
+      const { title, description } = req.body
+
+      Database.update(taskTable, id, { title, description })
+
+      res.end()
     },
   },
   {
     method: "PATCH",
     url: buildRoutePath("/tasks/:id/complete"),
     handler: (req, res) => {
-      res.end("Found method PATCH of task resource")
+      const { id } = req.params
+
+      Database.update(taskTable, id, { completed_at: new Date().toJSON() })
+
+      res.end()
     },
   },
   {
     method: "DELETE",
     url: buildRoutePath("/tasks/:id"),
     handler: (req, res) => {
-      res.end("Found method DELETE of task resource")
+      const { id } = req.params
+
+      Database.delete(taskTable, id)
+
+      res.end()
     },
   },
 ]

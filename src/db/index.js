@@ -15,6 +15,13 @@ class Database {
     fs.writeFile(dbDataUrl, JSON.stringify(this.#database, null, 2))
   }
 
+  #findById(table, id) {
+    const dbTaskIndex = this.#database[table].findIndex((p) => p.id == id)
+    if (dbTaskIndex == -1) throw new Error(`Task not found with id ${id}`)
+
+    return dbTaskIndex
+  }
+
   select(table) {
     return this.#database[table] ?? []
   }
@@ -24,6 +31,25 @@ class Database {
       ? this.#database[table].push(data)
       : (this.#database[table] = [data])
 
+    this.#persist()
+  }
+
+  update(table, id, data) {
+    const dbTaskIndex = this.#findById(table, id)
+
+    const row = this.#database[table][dbTaskIndex]
+    this.#database[table][dbTaskIndex] = {
+      ...row,
+      ...data,
+      updated_at: new Date().toJSON(),
+    }
+    this.#persist()
+  }
+
+  delete(table, id) {
+    const dbTaskIndex = this.#findById(table, id)
+
+    this.#database[table].splice(dbTaskIndex, 1)
     this.#persist()
   }
 }
