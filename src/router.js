@@ -1,6 +1,7 @@
 import buildRoutePath from "./utils/buildRoutePath.js"
 import Database from "./db/index.js"
 import Task from "./models/task.js"
+import removeUndefinedFromObject from "./utils/removeUndefinedFromObject.js"
 
 const taskTable = "tasks"
 
@@ -8,13 +9,18 @@ export default [
   {
     method: "GET",
     url: buildRoutePath("/ping"),
-    handler: (req, res) => res.end("Hello world!"),
+    handler: (_, res) => res.end("Hello world!"),
   },
   {
     method: "GET",
     url: buildRoutePath("/tasks"),
-    handler: (_, res) => {
-      const dbTasks = Database.select(taskTable)
+    handler: (req, res) => {
+      const { title, description } = req.query
+
+      const filters = { title, description }
+      removeUndefinedFromObject(filters)
+
+      const dbTasks = Database.select(taskTable, filters)
       res.end(JSON.stringify(dbTasks))
     },
   },
@@ -37,7 +43,10 @@ export default [
       const { id } = req.params
       const { title, description } = req.body
 
-      Database.update(taskTable, id, { title, description })
+      const newTask = { title, description }
+      removeUndefinedFromObject(newTask)
+
+      Database.update(taskTable, id, newTask)
 
       res.end()
     },
@@ -47,8 +56,10 @@ export default [
     url: buildRoutePath("/tasks/:id/complete"),
     handler: (req, res) => {
       const { id } = req.params
+      const { data } = Database.findById(taskTable, id)
 
-      Database.update(taskTable, id, { completed_at: new Date().toJSON() })
+      const completed_at = !data.completed_at ? new Date().toJSON() : null
+      Database.update(taskTable, id, { completed_at })
 
       res.end()
     },

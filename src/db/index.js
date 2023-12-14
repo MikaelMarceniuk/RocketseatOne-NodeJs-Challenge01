@@ -15,15 +15,28 @@ class Database {
     fs.writeFile(dbDataUrl, JSON.stringify(this.#database, null, 2))
   }
 
-  #findById(table, id) {
+  findById(table, id) {
     const dbTaskIndex = this.#database[table].findIndex((p) => p.id == id)
     if (dbTaskIndex == -1) throw new Error(`Task not found with id ${id}`)
 
-    return dbTaskIndex
+    return {
+      index: dbTaskIndex,
+      data: this.#database[table][dbTaskIndex],
+    }
   }
 
-  select(table) {
-    return this.#database[table] ?? []
+  select(table, filters) {
+    let dbData = this.#database[table] ?? []
+
+    if (Object.keys(filters).length > 0) {
+      dbData = dbData.filter((row) => {
+        return Object.entries(filters).some(([key, value]) =>
+          row[key].toLowerCase().includes(value.toLowerCase())
+        )
+      })
+    }
+
+    return dbData
   }
 
   insert(table, data) {
@@ -35,10 +48,10 @@ class Database {
   }
 
   update(table, id, data) {
-    const dbTaskIndex = this.#findById(table, id)
+    const { index } = this.findById(table, id)
 
-    const row = this.#database[table][dbTaskIndex]
-    this.#database[table][dbTaskIndex] = {
+    const row = this.#database[table][index]
+    this.#database[table][index] = {
       ...row,
       ...data,
       updated_at: new Date().toJSON(),
@@ -47,9 +60,9 @@ class Database {
   }
 
   delete(table, id) {
-    const dbTaskIndex = this.#findById(table, id)
+    const { index } = this.findById(table, id)
 
-    this.#database[table].splice(dbTaskIndex, 1)
+    this.#database[table].splice(index, 1)
     this.#persist()
   }
 }
